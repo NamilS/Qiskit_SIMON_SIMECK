@@ -38,7 +38,6 @@ def ccx_like(qc: QuantumCircuit, a, b, c):
     qc.cx(a, c)
     qc.cx(b, a)
     qc.h(c)
-
 def apply_ccx(qc: QuantumCircuit, a, b, c, decomp: bool):
     if decomp:
         ccx_like(qc, a, b, c)
@@ -54,8 +53,16 @@ def get_simeck_rounds(n: int):
         return 10
     raise ValueError("Unsupported n for SIMECK4")
 
-def get_simeck_rc():
-    return [0] * 62
+RC = {
+    16: [1,1,1,1,1,0,0,0,1,1,0,1,1,1,0,1,0,1,0,0,0,0,1,0,0,1,0,1,1,0,0,1],
+    24: [1,1,1,1,1,0,0,0,1,1,0,1,1,1,0,1,0,1,0,0,0,0,1,0,0,1,0,1,1,0,0,1,1,1,1,1],
+    32: [1,1,1,1,1,1,0,0,0,0,0,1,0,0,0,0,1,1,0,0,0,1,0,1,0,0,1,1,1,1,0,1,0,0,0,1,1,1,0,0,1,0,0,1],
+}
+
+def get_simeck_rc(n: int):
+    if n in RC:
+        return RC[n]
+    raise ValueError("Unsupported n for SIMECK4")
 
 def simeck_data_fun(qc: QuantumCircuit, l, r, k, decomp: bool):
     n = len(l)
@@ -105,7 +112,7 @@ def SIMECK4(n: int, decomp: bool):
     k3 = QuantumRegister(n, "k3")
 
     rounds = get_simeck_rounds(n)
-    rc = get_simeck_rc()
+    rc = get_simeck_rc(n)
 
     qc = QuantumCircuit(l, r, k0, k1, k2, k3, name=f"SIMECK{2*n}/{4*n}")
 
@@ -125,3 +132,4 @@ def SIMECK4(n: int, decomp: bool):
 
     regmap = {"l": l, "r": r, "k0": k0, "k1": k1, "k2": k2, "k3": k3}
     return qc, regmap
+
