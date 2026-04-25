@@ -1,5 +1,26 @@
 from qiskit import QuantumCircuit, QuantumRegister
 
+# Decomposition Type 1 
+# (T-depth = 4, full depth = 8, total gate count = 15)
+# def ccx_like(qc: QuantumCircuit, a, b, c):
+#     qc.tdg(a)
+#     qc.tdg(b)
+#     qc.h(c)
+#     qc.cx(c, a)
+#     qc.t(a)
+#     qc.cx(b, c)
+#     qc.cx(b, a)
+#     qc.t(c)
+#     qc.tdg(a)
+#     qc.cx(b, c)
+#     qc.cx(c, a)
+#     qc.t(a)
+#     qc.tdg(c)
+#     qc.cx(b, a)
+#     qc.h(c)
+
+# Decomposition Type 2 
+# (T-depth = 3, full depth = 9, total gate count = 16)
 def ccx_like(qc: QuantumCircuit, a, b, c):
     qc.h(c)
     qc.t(a)
