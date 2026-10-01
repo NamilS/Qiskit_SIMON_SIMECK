@@ -82,18 +82,20 @@ def simeck_key_update(qc: QuantumCircuit, src, dst, decomp: bool, rc_bit: int):
     n = len(src)
 
     for i in range(1, n, 2):
-        apply_ccx(qc, src[i % n], src[(i - 5) % n], dst[i], decomp)
-    for i in range(0, n, 2):
-        apply_ccx(qc, src[i % n], src[(i - 5) % n], dst[i], decomp)
+        apply_ccx(qc, src[i], src[(i - 5) % n], dst[i], decomp)
 
+        j = i - 1
+        if j >= 2 or (j == 0 and rc_bit == 1):
+            qc.x(dst[j])
+
+    for i in range(0, n, 2):
+        apply_ccx(qc, src[i], src[(i - 5) % n], dst[i], decomp)
+
+        j = i + 1
+        if j >= 2:
+            qc.x(dst[j])
     for i in range(n):
         qc.cx(src[(i - 1) % n], dst[i])
-
-    for i in range(2, n):
-        qc.x(dst[i])
-
-    if rc_bit == 1:
-        qc.x(dst[0])
 
 def simeck_roundfun(qc: QuantumCircuit, l, r, kin, ksrc, kout,
                     decomp: bool, rc, ex: int):
