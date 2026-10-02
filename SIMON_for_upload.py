@@ -296,8 +296,6 @@ def SIMON2(n: int, decomp: bool):
     r = QuantumRegister(n, "r")
     k0 = QuantumRegister(n, "k0")
     k1 = QuantumRegister(n, "k1")
-    k2 = QuantumRegister(n, "k2")
-    k3 = QuantumRegister(n, "k3")
 
     if n == 48:
         rounds = 25
@@ -308,7 +306,7 @@ def SIMON2(n: int, decomp: bool):
 
     rc = get_simon_rc(n, 2)
 
-    qc = QuantumCircuit(l, r, k0, k1, k2, k3, name=f"SIMON{2*n}/{2*n}")
+    qc = QuantumCircuit(l, r, k0, k1, name=f"SIMON{2*n}/{2*n}")
 
     ex = 0
     
@@ -319,7 +317,7 @@ def SIMON2(n: int, decomp: bool):
     simon2_finalfun(qc, l, r, k0, k1, decomp)
     simon2_finalfun(qc, r, l, k1, k0, decomp)
 
-    regmap = {"l": l, "r": r, "k0": k0, "k1": k1, "k2": k2, "k3": k3}
+    regmap = {"l": l, "r": r, "k0": k0, "k1": k1}
     return qc, regmap
 
 
