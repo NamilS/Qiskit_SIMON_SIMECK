@@ -207,12 +207,12 @@ def simon3_roundfun(qc: QuantumCircuit, l, r, k0, k1, k2,
     for i in range(1, n, 2):
         apply_ccx(qc, l[(i - 1) % n], l[(i - 8) % n], r[i], decomp)
     for i in range(0, n, 2):
-        qc.cx(k0[i], r[i])
+        qc.cx(k1[i], r[i])
 
     for i in range(0, n, 2):
         apply_ccx(qc, l[(i - 1) % n], l[(i - 8) % n], r[i], decomp)
     for i in range(1, n, 2):
-        qc.cx(k0[i], r[i])
+        qc.cx(k1[i], r[i])
 
     for i in range(n):
         qc.cx(l[(i - 2) % n], r[i])
@@ -329,7 +329,6 @@ def SIMON3(n: int, decomp: bool):
     k0 = QuantumRegister(n, "k0")
     k1 = QuantumRegister(n, "k1")
     k2 = QuantumRegister(n, "k2")
-
     if n == 24:
         rounds = 5
     elif n == 32:
@@ -338,28 +337,22 @@ def SIMON3(n: int, decomp: bool):
         rounds = 8
     else:
         raise ValueError("Unsupported n for SIMON3")
-
     rc = get_simon_rc(n, 3)
-
     qc = QuantumCircuit(l, r, k0, k1, k2, name=f"SIMON{2*n}/{3*n}")
-
     ex = 0
+    simon3_finalfun(qc, l, r, k0, k1, k2, decomp)
     for _ in range(rounds):
-        simon3_roundfun(qc, l, r, k0, k1, k2, decomp, rc, ex); ex += 1
-        simon3_roundfun(qc, r, l, k1, k2, k0, decomp, rc, ex); ex += 1
-        simon3_roundfun(qc, l, r, k2, k0, k1, decomp, rc, ex); ex += 1
         simon3_roundfun(qc, r, l, k0, k1, k2, decomp, rc, ex); ex += 1
         simon3_roundfun(qc, l, r, k1, k2, k0, decomp, rc, ex); ex += 1
         simon3_roundfun(qc, r, l, k2, k0, k1, decomp, rc, ex); ex += 1
-
-    simon3_roundfun(qc, l, r, k0, k1, k2, decomp, rc, ex); ex += 1
-    simon3_roundfun(qc, r, l, k1, k2, k0, decomp, rc, ex); ex += 1
-    simon3_roundfun(qc, l, r, k2, k0, k1, decomp, rc, ex); ex += 1
-
-    simon3_finalfun(qc, r, l, k0, k1, k2, decomp)
+        simon3_roundfun(qc, l, r, k0, k1, k2, decomp, rc, ex); ex += 1
+        simon3_roundfun(qc, r, l, k1, k2, k0, decomp, rc, ex); ex += 1
+        simon3_roundfun(qc, l, r, k2, k0, k1, decomp, rc, ex); ex += 1
+    simon3_roundfun(qc, r, l, k0, k1, k2, decomp, rc, ex); ex += 1
+    simon3_roundfun(qc, l, r, k1, k2, k0, decomp, rc, ex); ex += 1
+    simon3_roundfun(qc, r, l, k2, k0, k1, decomp, rc, ex); ex += 1
     simon3_finalfun(qc, l, r, k1, k2, k0, decomp)
     simon3_finalfun(qc, r, l, k2, k0, k1, decomp)
-
     regmap = {"l": l, "r": r, "k0": k0, "k1": k1, "k2": k2}
     return qc, regmap
 
@@ -370,26 +363,20 @@ def SIMON128_192(n: int, decomp: bool):
     k0 = QuantumRegister(n, "k0")
     k1 = QuantumRegister(n, "k1")
     k2 = QuantumRegister(n, "k2")
-
     rc = get_simon_rc(n, 3)
     qc = QuantumCircuit(l, r, k0, k1, k2, name=f"SIMON{2*n}/192")
-
     ex = 0
+    simon3_finalfun(qc, l, r, k0, k1, k2, decomp)
     for _ in range(11):
-        simon3_roundfun(qc, l, r, k0, k1, k2, decomp, rc, ex); ex += 1
-        simon3_roundfun(qc, r, l, k1, k2, k0, decomp, rc, ex); ex += 1
-        simon3_roundfun(qc, l, r, k2, k0, k1, decomp, rc, ex); ex += 1
         simon3_roundfun(qc, r, l, k0, k1, k2, decomp, rc, ex); ex += 1
         simon3_roundfun(qc, l, r, k1, k2, k0, decomp, rc, ex); ex += 1
         simon3_roundfun(qc, r, l, k2, k0, k1, decomp, rc, ex); ex += 1
-
-    simon3_finalfun(qc, l, r, k0, k1, k2, decomp)
+        simon3_roundfun(qc, l, r, k0, k1, k2, decomp, rc, ex); ex += 1
+        simon3_roundfun(qc, r, l, k1, k2, k0, decomp, rc, ex); ex += 1
+        simon3_roundfun(qc, l, r, k2, k0, k1, decomp, rc, ex); ex += 1
     simon3_finalfun(qc, r, l, k1, k2, k0, decomp)
     simon3_finalfun(qc, l, r, k2, k0, k1, decomp)
-
-    
     # for i in range(n):
     #     qc.swap(l[i], r[i])
-
     regmap = {"l": l, "r": r, "k0": k0, "k1": k1, "k2": k2}
     return qc, regmap
